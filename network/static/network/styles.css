@@ -1,0 +1,12 @@
+body {
+  padding: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  padding: 1rem;
+}
