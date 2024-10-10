@@ -17,4 +17,15 @@
         </form>
     </div>
     {% endif %}
+    {% for post in posts %}
+        <div class="card">
+            <h5 class="card-title mb-0 py-2">{{post.author}}</h5>
+            <p class="card-text mb-0 py-2">{{post.content}}</p>
+            <p class="text-muted mb-0 py-2">{{post.timestamp}}</p>
+            <div class="likes">
+                <img src="../../static/icons/heart.svg" width="24" height="24" class="my-2">
+                <span>0</span>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

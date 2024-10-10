@@ -9,4 +9,11 @@ form {
 
 .card {
   padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.likes {
+  & span {
+    vertical-align: middle;
+  }
 }

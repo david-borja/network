@@ -10,6 +10,7 @@ class Post(models.Model):
     content = models.CharField(max_length=140)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="own_posts")
     timestamp = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Post {self.id}: {self.content} posted by {self.author}"
