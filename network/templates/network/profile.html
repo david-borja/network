@@ -1,0 +1,40 @@
+{% extends "network/layout.html" %}
+{% block body %}
+    <h2>{{ username }}</h2>
+    {% if user.is_authenticated and username != user.username %}
+      <form method="post" action="{% url 'toggle_follow' %}">
+        {% csrf_token %}
+        <input name="follower" value="{{ user.username }}" type="hidden">
+        <input name="followee" value="{{ username }}" type="hidden">
+        {% if is_following_profile_user %}
+          <input name="_method" value="DELETE" type="hidden">
+          <input class="btn btn-secondary" style="width: fit-content;" type="submit" value="Following">
+        {% else %}
+          <input class="btn btn-primary" style="width: fit-content;" type="submit" value="Follow">
+        {% endif %}
+        </form>
+    {% endif %}
+      <section class="container text-center my-4">
+        <div class="row">
+          <div class="col-sm">{{ posts_count }}</div>
+          <div class="col-sm">{{ followers_count }}</div>
+          <div class="col-sm">{{ following_count }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm">Posts</div>
+          <div class="col-sm">Followers</div>
+          <div class="col-sm">Following</div>
+        </div>
+      </section>
+        {% for post in posts %}
+        <div class="card">
+            <h5 class="card-title mb-0 py-2"><a href="{% url 'profile' post.author.username %}">{{post.author}}</a></h5>
+            <p class="card-text mb-0 py-2">{{post.content}}</p>
+            <p class="text-muted mb-0 py-2">{{post.timestamp}}</p>
+            <div class="likes">
+                <img src="../../static/icons/heart.svg" width="24" height="24" class="my-2">
+                <span>0</span>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
