@@ -9,7 +9,8 @@ from .models import User, Post, Follower
 
 def index(request):
     posts = Post.objects.order_by("-timestamp")
-    return render(request, "network/index.html", {"posts": posts})
+    context = {"title": "All Posts", "posts": posts, "show_new_post_field": True}
+    return render(request, "network/index.html", context)
 
 
 def login_view(request):
@@ -108,3 +109,10 @@ def toggle_follow(request):
                 followee=User.objects.get(username=followee),
             )
         return HttpResponseRedirect(reverse("profile", args=[followee]))
+
+@login_required()
+def following(request):
+    following_users = request.user.following.all().values_list('followee', flat=True)
+    posts = Post.objects.filter(author__in=following_users).order_by("-timestamp")
+    context = {"title": "Following", "posts": posts, "show_new_post_field": False}
+    return render(request, "network/index.html", context)
