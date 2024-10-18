@@ -1,0 +1,20 @@
+[
+  { "username": "david", "email": "david@test.com", "password": "1234" },
+  { "username": "Twitter", "email": "Twitter@test.com", "password": "1234" },
+  { "username": "MacaulayCulkin", "email": "MacaulayCulkin@test.com", "password": "1234" },
+  { "username": "GretaThunberg", "email": "GretaThunberg@test.com", "password": "1234" },
+  { "username": "ElonMusk", "email": "ElonMusk@test.com", "password": "1234" },
+  { "username": "HarryStyles", "email": "HarryStyles@test.com", "password": "1234" },
+  { "username": "SeanBean", "email": "SeanBean@test.com", "password": "1234" },
+  { "username": "Zendaya", "email": "Zendaya@test.com", "password": "1234" },
+  { "username": "RyanReynolds", "email": "RyanReynolds@test.com", "password": "1234" },
+  { "username": "SpongeBobSquarePants", "email": "SpongeBobSquarePants@test.com", "password": "1234" },
+  { "username": "TomHanks", "email": "TomHanks@test.com", "password": "1234" },
+  { "username": "EllenDeGeneres", "email": "EllenDeGeneres@test.com", "password": "1234" },
+  { "username": "NeilDeGrasseTyson", "email": "NeilDeGrasseTyson@test.com", "password": "1234" },
+  { "username": "BlakeLively", "email": "BlakeLively@test.com", "password": "1234" },
+  { "username": "OprahWinfrey", "email": "OprahWinfrey@test.com", "password": "1234" },
+  { "username": "DwayneJohnson", "email": "DwayneJohnson@test.com", "password": "1234" },
+  { "username": "BradleyCooper", "email": "BradleyCooper@test.com", "password": "1234" },
+  { "username": "SethRogen", "email": "SethRogen@test.com", "password": "1234" }
+]
