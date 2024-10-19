@@ -18,4 +18,29 @@
     </div>
     {% endif %}
     {% feed posts %}
+    <nav aria-label="Tweets pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if not pagination.is_first_page %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pagination.previous_page }}" aria-label="Previous">
+                        <span aria-hidden="true">Previous</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for page_button in pagination.page_buttons %}
+                {% if page_button == pagination.page_number %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ page_button }}">{{page_button}}</a></li>                
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_button }}">{{page_button}}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if not pagination.is_last_page %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pagination.next_page }}" aria-label="Next">
+                        <span aria-hidden="true">Next</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

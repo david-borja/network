@@ -1,4 +1,6 @@
+import math
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -7,10 +9,48 @@ from django.urls import reverse
 
 from .models import User, Post, Follower
 
+from .utils import check_is_valid_page_query_param
+
+PAGINATION_LIMIT = 10
+MAX_PAGE_BUTTONS = 5
+DEFAULT_PAGE = 1
+
 def index(request):
-    posts = Post.objects.order_by("-timestamp")
-    context = {"title": "All Posts", "posts": posts, "show_new_post_field": True}
-    return render(request, "network/index.html", context)
+    requested_page_number = request.GET.get("page")
+    post_list = Post.objects.order_by("-timestamp")
+    paginator = Paginator(post_list, PAGINATION_LIMIT)
+    num_pages = paginator.num_pages
+    is_valid_page = check_is_valid_page_query_param(requested_page_number, num_pages)
+
+    if requested_page_number and not is_valid_page:
+        return HttpResponseRedirect(reverse("index"))
+
+    else:
+        page_number = DEFAULT_PAGE if requested_page_number == None else int(requested_page_number)
+        page = paginator.page(page_number)
+        paginated_posts = page.object_list
+        central_page_button_index = math.floor(MAX_PAGE_BUTTONS / 2)
+        is_last_window = page_number > (num_pages - ((MAX_PAGE_BUTTONS / 2) - 1))
+        first_page_button = (num_pages - MAX_PAGE_BUTTONS) + 1 if is_last_window else max(page_number - central_page_button_index, 1)
+        last_page_button = min(first_page_button + (MAX_PAGE_BUTTONS - 1), num_pages)
+        page_buttons = range(first_page_button, last_page_button + 1)
+
+        pagination = {
+            "is_first_page": page_number == 1,
+            "is_last_page": page_number == num_pages,
+            "page_buttons": page_buttons,
+            "page_number": page_number,
+            "previous_page": page_number - 1,
+            "next_page": page_number + 1,
+        }
+
+        context = {
+            "title": "All Posts",
+            "posts": paginated_posts,
+            "show_new_post_field": True,
+            "pagination": pagination,
+        }
+        return render(request, "network/index.html", context)
 
 
 def login_view(request):
@@ -111,7 +151,7 @@ def toggle_follow(request):
         return HttpResponseRedirect(reverse("profile", args=[followee]))
 
 @login_required()
-def following(request):
+def following(request): # TO DO: remove useless pagination buttons on following page
     following_users = request.user.following.all().values_list('followee', flat=True)
     posts = Post.objects.filter(author__in=following_users).order_by("-timestamp")
     context = {"title": "Following", "posts": posts, "show_new_post_field": False}
