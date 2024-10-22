@@ -19,7 +19,8 @@ def paginate(requested_page_number, post_list):
     num_pages = paginator.num_pages
     is_valid_page = check_is_valid_page_query_param(requested_page_number, num_pages)
 
-    if requested_page_number and not is_valid_page:
+    if (requested_page_number and not is_valid_page) or requested_page_number == "":
+        # Query param cannot be parsed to an int
         return {"page_error": True}
 
     else:
@@ -33,12 +34,12 @@ def paginate(requested_page_number, post_list):
         central_page_button_index = math.floor(MAX_PAGE_BUTTONS / 2)
         is_last_window = page_number > (num_pages - ((MAX_PAGE_BUTTONS / 2) - 1))
         first_page_button = (
-            (num_pages - MAX_PAGE_BUTTONS) + 1
+            max(((num_pages - MAX_PAGE_BUTTONS) + 1), 1)
             if is_last_window
             else max(page_number - central_page_button_index, 1)
         )
         last_page_button = min(first_page_button + (MAX_PAGE_BUTTONS - 1), num_pages)
-        page_buttons = range(first_page_button, last_page_button + 1)
+        page_buttons = range(first_page_button, last_page_button + 1) if num_pages > 1 else None
 
         pagination = {
             "is_first_page": page_number == 1,

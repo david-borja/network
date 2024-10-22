@@ -84,18 +84,25 @@ def create_post(request):
         return HttpResponseRedirect(reverse("index"))
 
 def profile(request, username):
+    requested_page_number = request.GET.get("page")
     user = User.objects.get(username=username)
-    is_following_profile_user = request.user.following.filter(followee=user).exists() if request.user.is_authenticated else None
     posts = user.own_posts.order_by("-timestamp")
+
+    result = paginate(requested_page_number, posts)
+    if "page_error" in result:
+        return HttpResponseRedirect(reverse("profile", args=[username]))
+
+    is_following_profile_user = request.user.following.filter(followee=user).exists() if request.user.is_authenticated else None
     followers = user.followers
     following = user.following
     context = {
         "username": username,
-        "posts": posts,
+        "posts": result["paginated_posts"],
         "posts_count": posts.count(),
         "followers_count": followers.count(),
         "following_count": following.count(),
-        "is_following_profile_user": is_following_profile_user
+        "is_following_profile_user": is_following_profile_user,
+        "pagination": result["pagination"],
     }
     return render(request, "network/profile.html", context)
 
@@ -124,7 +131,18 @@ def toggle_follow(request):
 
 @login_required()
 def following(request): # TO DO: remove useless pagination buttons on following page
+    requested_page_number = request.GET.get("page")
     following_users = request.user.following.all().values_list('followee', flat=True)
     posts = Post.objects.filter(author__in=following_users).order_by("-timestamp")
-    context = {"title": "Following", "posts": posts, "show_new_post_field": False}
+
+    result = paginate(requested_page_number, posts)
+    if "page_error" in result:
+        return HttpResponseRedirect(reverse("following"))
+
+    context = {
+        "title": "Following", 
+        "posts": result["paginated_posts"],
+        "show_new_post_field": False,
+        "pagination": result["pagination"],
+    }
     return render(request, "network/index.html", context)
