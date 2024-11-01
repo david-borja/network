@@ -1,16 +1,19 @@
+import json
+from uuid import UUID
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from .models import User, Post, Follower
 from .utils import paginate
 
 
 def index(request):
     requested_page_number = request.GET.get("page")
-    post_list = Post.objects.order_by("-timestamp")
+    post_list = Post.objects.order_by("-creation_date")
 
     result = paginate(requested_page_number, post_list)
     if "page_error" in result:
@@ -86,7 +89,7 @@ def create_post(request):
 def profile(request, username):
     requested_page_number = request.GET.get("page")
     user = User.objects.get(username=username)
-    posts = user.own_posts.order_by("-timestamp")
+    posts = user.own_posts.order_by("-creation_date")
 
     result = paginate(requested_page_number, posts)
     if "page_error" in result:
@@ -133,7 +136,7 @@ def toggle_follow(request):
 def following(request): # TO DO: remove useless pagination buttons on following page
     requested_page_number = request.GET.get("page")
     following_users = request.user.following.all().values_list('followee', flat=True)
-    posts = Post.objects.filter(author__in=following_users).order_by("-timestamp")
+    posts = Post.objects.filter(author__in=following_users).order_by("-creation_date")
 
     result = paginate(requested_page_number, posts)
     if "page_error" in result:
@@ -146,3 +149,26 @@ def following(request): # TO DO: remove useless pagination buttons on following
         "pagination": result["pagination"],
     }
     return render(request, "network/index.html", context)
+
+@login_required()
+def edit_post(request, post_id):
+    def is_valid_uuid(uuid_string):
+        try:
+            # Attempt to create a UUID object; will raise ValueError if invalid
+            UUID(uuid_string, version=4)
+            return True
+        except ValueError:
+            return False
+
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        # post_id = 'asdfa'
+        post = Post.objects.get(pk=post_id) if is_valid_uuid(post_id) else None
+        if post:
+            post_author = post.author
+            if post_author == request.user:
+                post.content = data["content"]
+                post.last_edit_date = timezone.now()
+                post.save()
+                return HttpResponse(status=200)
+    return HttpResponse(status=400)

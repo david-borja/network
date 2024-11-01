@@ -21,7 +21,7 @@ def insert_posts(self, data):
                 content=content,
                 author=author,
                 likes=likes,
-                timestamp=timestamp,
+                creation_date=timestamp,
             )
             post.save()
             self.stdout.write(self.style.SUCCESS(f"Created post: '{content}'"))

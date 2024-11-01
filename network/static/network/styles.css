@@ -17,3 +17,12 @@ form {
     vertical-align: middle;
   }
 }
+
+.edit-date {
+  font-size: 10px;
+}
+
+.dates {
+  display: flex;
+  flex-direction: column;
+}

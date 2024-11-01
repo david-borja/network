@@ -11,15 +11,17 @@ class Post(models.Model):
     content = models.CharField(max_length=140)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="own_posts")
     likes = models.IntegerField(default=0)
-    timestamp = models.DateTimeField()
+    creation_date = models.DateTimeField()
+    last_edit_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Post {self.id}: {self.content} posted by {self.author}"
 
     def save(self, *args, **kwargs):
-    # If no timestamp is provided, use the current time
-        if not self.timestamp:
-            self.timestamp = timezone.now()
+    # If no creation_date is provided, use the current time
+    # This behaviour allows custom creation_date when seeding mock data
+        if not self.creation_date:
+            self.creation_date = timezone.now()
         super(Post, self).save(*args, **kwargs)
 
 class Follower(models.Model):
