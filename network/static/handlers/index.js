@@ -12,7 +12,6 @@ export const handleCancelEdit = (postId) => {
 }
 
 export const handleSubmitEdit = (postId, content) => {
-  console.log('handleSubmitEdit')
   const $editButton = $(`input[data-post='${postId}']`)
   $editButton.style.display = 'block'
   const $editFormContainer =
