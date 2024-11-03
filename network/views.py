@@ -3,7 +3,7 @@ from uuid import UUID
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -162,7 +162,6 @@ def edit_post(request, post_id):
 
     if request.method == "PUT":
         data = json.loads(request.body)
-        # post_id = 'asdfa'
         post = Post.objects.get(pk=post_id) if is_valid_uuid(post_id) else None
         if post:
             post_author = post.author
@@ -170,5 +169,10 @@ def edit_post(request, post_id):
                 post.content = data["content"]
                 post.last_edit_date = timezone.now()
                 post.save()
-                return HttpResponse(status=200)
+                return JsonResponse({
+                    "id": post.id,
+                    "content": post.content,
+                    "creationDate": post.creation_date,
+                    "lastEditDate": post.last_edit_date,
+                }, status=200)
     return HttpResponse(status=400)

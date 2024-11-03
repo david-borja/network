@@ -45,79 +45,9 @@
     </ul>
 </nav>
 {% endif %}
-<script>
-    const $ = (selector) => document.querySelector(selector)
-    const $$ = (selector) => document.querySelectorAll(selector)
-    const mimicBackendTimestampt = () => {
-        const utcNow =  new Date()
-        utcNow.setMinutes(utcNow.getMinutes() + utcNow.getTimezoneOffset());
-        const date = new Date(utcNow);
-
-        const options = {
-            month: "short",      // "Nov" for November
-            day: "numeric",      // Day of the month without leading zero
-            year: "numeric",     // Full year
-            hour: "numeric",     // Hour (12-hour format)
-            minute: "2-digit",   // Minute with leading zero
-            hour12: true         // 12-hour format with a.m./p.m.
-        };
-
-        const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
-        const dividedString = formattedDate.split(' ')
-        const monthIndex = 0
-        const hour12FormatIndex = dividedString.length - 1
-        const { 0: month, [hour12FormatIndex]: hour12Format } = dividedString
-        const formattedMonth = month.concat('.')
-        const formattedHour12Format = hour12Format.toLowerCase().split('').join('.').concat('.')
-        const dividedStringWithoutEdgeIndexes = dividedString.slice(1, dividedString.length - 1)
-        const result = [formattedMonth, ...dividedStringWithoutEdgeIndexes, formattedHour12Format].join(' ')
-        return result
-    }
-
-
-    const putPost = (postId, content, csrftoken) => {
-        return fetch(`/edit-post/${postId}`, {
-            method: 'PUT',
-            headers: { 'X-CSRFToken': csrftoken },
-            body: JSON.stringify({ content }),
-            mode: 'same-origin',
-        }).then(res => res)
-    }
-
-    const handleCancelEdit = (postId) => {
-        const $editButton = $(`input[data-post='${postId}']`)
-        $editButton.style.display = 'block'
-        const $editFormContainer = $editButton.parentElement.querySelector('.edit-post')
-        $editFormContainer.style.display = 'none'
-        const $contentParagraph = $editButton.parentElement.querySelector('.content')
-        $contentParagraph.style.display = 'block'
-    }
-
-    const handleSubmitEdit = (postId, content) => {
-        const $editButton = $(`input[data-post='${postId}']`)
-        $editButton.style.display = 'block'
-        const $editFormContainer = $editButton.parentElement.querySelector('.edit-post')
-        $editFormContainer.style.display = 'none'
-        const $contentParagraph = $editButton.parentElement.querySelector('.content')
-        $contentParagraph.style.display = 'block'
-        const csrftoken = $('[name=csrfmiddlewaretoken]').value;
-
-        putPost(postId, content, csrftoken).then((response => {
-            if (response.ok) {
-                $contentParagraph.innerText = content
-                const $post = $editButton.parentElement
-                let $editDate = $post.querySelector('.edit-date')
-                if (!$editDate) {
-                    const $createdEditDate = document.createElement('span')
-                    $createdEditDate.classList.add('text-muted', 'mb-0', 'edit-date')
-                    $post.querySelector('.dates').appendChild($createdEditDate)
-                    $editDate = $createdEditDate
-                }
-                $editDate.innerText = `Edited on: ${mimicBackendTimestampt()}`
-            }
-        }))
-        return false
-    }
+<script type="module">
+    import { handleSubmitEdit, handleCancelEdit } from '../../../static/handlers/index.js'
+    import { $$ } from '../../../static/utils/index.js'
 
     const $buttons = $$(".edit-button")
 
