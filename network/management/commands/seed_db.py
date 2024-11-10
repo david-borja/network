@@ -15,12 +15,12 @@ def insert_posts(self, data):
         for item in data:
             content = item["content"]
             timestamp = item["timestamp"]
-            likes = item["likes"]
+            # likes = item["likes"]
             author = User.objects.get_by_natural_key(item["author"])
             post = Post(
                 content=content,
                 author=author,
-                likes=likes,
+                # likes=likes,
                 creation_date=timestamp,
             )
             post.save()
