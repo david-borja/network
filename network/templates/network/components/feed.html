@@ -33,7 +33,7 @@
             {% endif %}
         </div>
         {% if post.author.username == username %}
-            <input data-post="{{ post.id }}" class="edit-button btn btn-light position-absolute" style="width: fit-content; top: 5; right: 12px;" type="submit" value="Edit">
+            <input class="edit-button btn btn-light position-absolute" style="width: fit-content; top: 5; right: 12px;" type="submit" value="Edit">
         {% endif %}
     </div>
 {% endfor %}
@@ -72,7 +72,7 @@
 
     $buttons.forEach($button => {
         $button.onclick = () => {
-            const postId = $button.dataset.post
+            const postId = $button.parentElement.dataset.post
             const $contentParagraph = $button.parentElement.querySelector('.content')
             const content = $contentParagraph.innerText
             $$('.content').forEach((elem) => elem.style.display = 'block')
@@ -105,8 +105,6 @@
     })
 
     const $likeContainers= $$(".likes")
-
-    // TO DO: remove data-post from edit button
 
     $likeContainers.forEach($likeContainer => {
         const postId = $likeContainer.parentElement.dataset.post

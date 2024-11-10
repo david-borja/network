@@ -2,7 +2,7 @@ import { putPost, toggleLike } from '../services/posts.js'
 import { $, mimicDjangoDateString } from '../utils/index.js'
 
 export const handleCancelEdit = (postId) => {
-  const $editButton = $(`input[data-post='${postId}']`)
+  const $editButton = $(`div[data-post='${postId}'] input.edit-button`)
   $editButton.style.display = 'block'
   const $editFormContainer =
     $editButton.parentElement.querySelector('.edit-post')
@@ -12,7 +12,7 @@ export const handleCancelEdit = (postId) => {
 }
 
 export const handleSubmitEdit = (postId, content) => {
-  const $editButton = $(`input[data-post='${postId}']`)
+  const $editButton = $(`div[data-post='${postId}'] input.edit-button`)
   $editButton.style.display = 'block'
   const $editFormContainer =
     $editButton.parentElement.querySelector('.edit-post')
