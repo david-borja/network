@@ -1,4 +1,5 @@
 import math
+from uuid import UUID
 from django.core.paginator import Paginator
 
 PAGINATION_LIMIT = 10
@@ -51,3 +52,11 @@ def paginate(requested_page_number, post_list):
         }
 
         return {"paginated_posts": paginated_posts, "pagination": pagination}
+
+def check_is_valid_uuid(uuid_string):
+    try:
+        # Attempt to create a UUID object; will raise ValueError if invalid
+        UUID(uuid_string, version=4)
+        return True
+    except ValueError:
+        return False

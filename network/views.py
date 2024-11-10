@@ -1,5 +1,4 @@
 import json
-from uuid import UUID
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -8,12 +7,19 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from .models import User, Post, Follower
-from .utils import paginate
+from .utils import paginate, check_is_valid_uuid
 
 
 def index(request):
     requested_page_number = request.GET.get("page")
     post_list = Post.objects.order_by("-creation_date")
+    own_likes = request.user.own_likes if request.user.is_authenticated else None
+
+    for post in post_list:
+        likes_count = post.likes.count()
+        is_liked = own_likes.filter(pk=post.id).exists() if request.user.is_authenticated else None
+        post.likes_count = likes_count
+        post.is_liked = is_liked
 
     result = paginate(requested_page_number, post_list)
     if "page_error" in result:
@@ -152,17 +158,9 @@ def following(request): # TO DO: remove useless pagination buttons on following
 
 @login_required()
 def edit_post(request, post_id):
-    def is_valid_uuid(uuid_string):
-        try:
-            # Attempt to create a UUID object; will raise ValueError if invalid
-            UUID(uuid_string, version=4)
-            return True
-        except ValueError:
-            return False
-
     if request.method == "PUT":
         data = json.loads(request.body)
-        post = Post.objects.get(pk=post_id) if is_valid_uuid(post_id) else None
+        post = Post.objects.get(pk=post_id) if check_is_valid_uuid(post_id) else None
         if post:
             post_author = post.author
             if post_author == request.user:
@@ -176,3 +174,17 @@ def edit_post(request, post_id):
                     "lastEditDate": post.last_edit_date,
                 }, status=200)
     return HttpResponse(status=400)
+
+@login_required()
+def post_likes(request, post_id):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        post = Post.objects.get(pk=post_id) if check_is_valid_uuid(post_id) else None
+        if post:
+            is_liked = data["isLiked"]
+            if is_liked:
+                post.likes.add(request.user)
+            else:
+                post.likes.remove(request.user)
+            return HttpResponse(status=200)
+        return HttpResponse(status=400)

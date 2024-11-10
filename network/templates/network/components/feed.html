@@ -1,5 +1,5 @@
 {% for post in posts %}
-    <div class="card position-relative">
+    <div class="card position-relative" data-post="{{ post.id }}">
         <h5 class="card-title mb-0 py-2"><a href="{% url 'profile' post.author.username %}">{{post.author}}</a></h5>
         <div class="edit-post"></div>
         <p class="content card-text mb-0 py-2">{{ post.content }}</p>
@@ -10,8 +10,27 @@
             {% endif %}
         </div>
         <div class="likes">
-            <img src="../../static/icons/heart.svg" width="24" height="24" class="my-2">
-            <span>0</span>
+            {% if username %}
+                {% if post.is_liked %}
+                    <button class="like-button d-none">
+                        <img src="../../static/icons/heart.svg" width="24" height="24" class="my-2">
+                    </button>
+                    <button class="like-button liked">
+                        <img src="../../static/icons/heart-fill.svg" width="24" height="24" class="my-2">
+                    </button>
+                {% else %}
+                    <button class="like-button">
+                        <img src="../../static/icons/heart.svg" width="24" height="24" class="my-2">
+                    </button>
+                    <button class="like-button liked d-none">
+                        <img src="../../static/icons/heart-fill.svg" width="24" height="24" class="my-2">
+                    </button>
+                {% endif %}
+            {% endif %}
+            <span class="likes-count">{{ post.likes_count }}</span>
+            {% if not username %}
+                <span class="d-inline-block my-2">Likes</span>
+            {% endif %}
         </div>
         {% if post.author.username == username %}
             <input data-post="{{ post.id }}" class="edit-button btn btn-light position-absolute" style="width: fit-content; top: 5; right: 12px;" type="submit" value="Edit">
@@ -46,7 +65,7 @@
 </nav>
 {% endif %}
 <script type="module">
-    import { handleSubmitEdit, handleCancelEdit } from '../../../static/handlers/index.js'
+    import { handleSubmitEdit, handleCancelEdit, handleLikeClick } from '../../../static/handlers/index.js'
     import { $$ } from '../../../static/utils/index.js'
 
     const $buttons = $$(".edit-button")
@@ -64,7 +83,6 @@
             $editFormContainer.style.display = 'block'
             $editFormContainer.innerHTML = `
                 <form method="POST">
-                    {% csrf_token %}
                     <input type="hidden" name="_method" value="PUT"/>
                     <textarea
                         name="edit-post"
@@ -84,5 +102,17 @@
             $editFormContainer.querySelector('.cancel-edit').onclick = () => handleCancelEdit(postId)
             $editFormContainer.querySelector('.submit-edit').onclick = () => handleSubmitEdit(postId, $editPostForm.value)
         }
+    })
+
+    const $likeContainers= $$(".likes")
+
+    // TO DO: remove data-post from edit button
+
+    $likeContainers.forEach($likeContainer => {
+        const postId = $likeContainer.parentElement.dataset.post
+        const $likeButtonLiked = $likeContainer.querySelector('.like-button.liked')
+        const $likeButton = $likeContainer.querySelector('.like-button')
+        $likeButtonLiked.onclick = () => handleLikeClick(postId, { isLiked: true })
+        $likeButton.onclick = () => handleLikeClick(postId, { isLiked: false })
     })
 </script>

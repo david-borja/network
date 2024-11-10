@@ -1,4 +1,4 @@
-import { putPost } from '../services/posts.js'
+import { putPost, toggleLike } from '../services/posts.js'
 import { $, mimicDjangoDateString } from '../utils/index.js'
 
 export const handleCancelEdit = (postId) => {
@@ -43,4 +43,33 @@ export const handleSubmitEdit = (postId, content) => {
       console.error(`Error: ${error.message}`)
     })
   return false
+}
+
+export const handleLikeClick = (postId, { isLiked }) => {
+  const csrftoken = $('[name=csrfmiddlewaretoken]').value
+  toggleLike(postId, !isLiked, csrftoken)
+    .then((response) => {
+      if (response.ok) {
+        const $postCard = $(`div[data-post='${postId}']`)
+        const likedSelector = '.like-button.liked'
+        const notLikedSelector = '.like-button'
+        const visibleButtonSelector = isLiked ? likedSelector : notLikedSelector
+        const hiddenButtonSelector = isLiked ? notLikedSelector : likedSelector
+        const $visibleLikeButton = $postCard.querySelector(
+          visibleButtonSelector
+        )
+        const $hiddenLikeButton = $postCard.querySelector(
+          hiddenButtonSelector
+        )
+        $visibleLikeButton.classList.add('d-none')
+        $hiddenLikeButton.classList.remove('d-none')
+        const $likesCount = $postCard.querySelector('.likes-count')
+        const countAsString = $likesCount.innerText
+        const count = parseInt(countAsString)
+        $likesCount.innerText = isLiked ? Math.max(count - 1, 0) : count + 1
+      } else throw new Error('Failed to like post')
+    })
+    .catch((error) => {
+      console.error(`Error: ${error.message}`)
+    })
 }

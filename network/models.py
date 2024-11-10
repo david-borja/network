@@ -10,7 +10,7 @@ class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.CharField(max_length=140)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="own_posts")
-    likes = models.IntegerField(default=0)
+    likes = models.ManyToManyField(User, blank=True, related_name="own_likes")
     creation_date = models.DateTimeField()
     last_edit_date = models.DateTimeField(blank=True, null=True)
 

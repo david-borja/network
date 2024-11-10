@@ -26,3 +26,12 @@ form {
   display: flex;
   flex-direction: column;
 }
+
+.like-button {
+  border: unset;
+  background: none;
+}
+
+.like-button:focus {
+  outline: none;
+}
