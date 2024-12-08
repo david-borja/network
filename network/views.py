@@ -96,6 +96,13 @@ def profile(request, username):
     requested_page_number = request.GET.get("page")
     user = User.objects.get(username=username)
     posts = user.own_posts.order_by("-creation_date")
+    own_likes = request.user.own_likes
+
+    for post in posts:
+        likes_count = post.likes.count()
+        is_liked = own_likes.filter(pk=post.id).exists()
+        post.likes_count = likes_count
+        post.is_liked = is_liked
 
     result = paginate(requested_page_number, posts)
     if "page_error" in result:
@@ -143,6 +150,13 @@ def following(request): # TO DO: remove useless pagination buttons on following
     requested_page_number = request.GET.get("page")
     following_users = request.user.following.all().values_list('followee', flat=True)
     posts = Post.objects.filter(author__in=following_users).order_by("-creation_date")
+    own_likes = request.user.own_likes
+
+    for post in posts:
+        likes_count = post.likes.count()
+        is_liked = own_likes.filter(pk=post.id).exists()
+        post.likes_count = likes_count
+        post.is_liked = is_liked
 
     result = paginate(requested_page_number, posts)
     if "page_error" in result:
